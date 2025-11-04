@@ -269,6 +269,52 @@
             font-weight: bold;
             margin-right: 10px;
         }
+
+        /* Mod Seçim Butonları */
+        .mode-selection {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: center;
+        }
+
+        .btn-mode {
+            flex: 1;
+            padding: 20px;
+            font-size: 18px;
+            border: 2px solid #e9ecef;
+            background: #f8f9fa;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-mode:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        /* Cevap Gösterme Modu */
+        .answer-display {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .correct-answer {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 25px;
+            line-height: 1.6;
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.3);
+        }
+
     </style>
 </head>
 <body>
@@ -300,11 +346,29 @@
             <div class="question-container">
                 <div class="question-number" id="questionNumber"></div>
                 <div class="question-text" id="questionText"></div>
-                <div class="options" id="optionsContainer"></div>
+                
+                <!-- Mod Seçim Butonları (İlk gösterilen) -->
+                <div class="mode-selection" id="modeSelection">
+                    <button class="btn btn-mode" id="showAnswerBtn" onclick="showAnswerMode()">
+                        📖 Cevabı Göster
+                    </button>
+                    <button class="btn btn-mode" id="showOptionsBtn" onclick="showOptionsMode()">
+                        📝 Şıkları Göster
+                    </button>
+                </div>
+
+                <!-- Cevap Gösterme Modu -->
+                <div class="answer-display hidden" id="answerDisplay">
+                    <div class="correct-answer" id="correctAnswerText"></div>
+                </div>
+
+                <!-- Şıklı Test Modu -->
+                <div class="options hidden" id="optionsContainer"></div>
             </div>
+            
             <div class="buttons">
                 <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()">← Önceki</button>
-                <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()">Cevabı Kontrol Et</button>
+                <button class="btn btn-primary hidden" id="checkBtn" onclick="checkAnswer()">Cevabı Kontrol Et</button>
                 <button class="btn btn-primary hidden" id="nextBtn" onclick="nextQuestion()">Sonraki →</button>
             </div>
         </div>
@@ -457,7 +521,6 @@
             const question = questions[currentQuestionIndex];
             const questionNumber = document.getElementById('questionNumber');
             const questionText = document.getElementById('questionText');
-            const optionsContainer = document.getElementById('optionsContainer');
             const questionCounter = document.getElementById('questionCounter');
             const progressBar = document.getElementById('progressBar');
 
@@ -469,8 +532,55 @@
             const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
             progressBar.style.width = progress + '%';
 
+            // Ekranı sıfırla - sadece mod seçimini göster
+            resetQuestionDisplay();
+
+            // Önceki buton kontrolü
+            document.getElementById('prevBtn').disabled = currentQuestionIndex === 0;
+        }
+
+        function resetQuestionDisplay() {
+            // Mod seçim butonlarını göster
+            document.getElementById('modeSelection').classList.remove('hidden');
+            
+            // Diğer alanları gizle
+            document.getElementById('answerDisplay').classList.add('hidden');
+            document.getElementById('optionsContainer').classList.add('hidden');
+            document.getElementById('checkBtn').classList.add('hidden');
+            document.getElementById('nextBtn').classList.add('hidden');
+            
+            // Şıkları temizle
+            document.getElementById('optionsContainer').innerHTML = '';
+        }
+
+        function showAnswerMode() {
+            const question = questions[currentQuestionIndex];
+            
+            // Mod seçimini gizle
+            document.getElementById('modeSelection').classList.add('hidden');
+            
+            // Cevabı göster
+            document.getElementById('correctAnswerText').textContent = question.correctAnswer;
+            document.getElementById('answerDisplay').classList.remove('hidden');
+            
+            // Sonraki butonunu göster
+            document.getElementById('nextBtn').classList.remove('hidden');
+            
+            // Bu soruyu cevaplanmış olarak işaretle
+            answeredQuestions[currentQuestionIndex] = 'viewed';
+        }
+
+        function showOptionsMode() {
+            const question = questions[currentQuestionIndex];
+            const optionsContainer = document.getElementById('optionsContainer');
+            
+            // Mod seçimini gizle
+            document.getElementById('modeSelection').classList.add('hidden');
+            
             // Şıkları göster
             optionsContainer.innerHTML = '';
+            optionsContainer.classList.remove('hidden');
+            
             question.options.forEach((option, index) => {
                 const optionDiv = document.createElement('div');
                 optionDiv.className = 'option';
@@ -479,12 +589,6 @@
                     <label for="option${index}" style="cursor: pointer; flex: 1;">${option}</label>
                 `;
                 
-                // Eğer bu soru daha önce cevaplanmışsa, seçimi göster
-                if (answeredQuestions[currentQuestionIndex] === option) {
-                    optionDiv.classList.add('selected');
-                    optionDiv.querySelector('input').checked = true;
-                }
-
                 optionDiv.addEventListener('click', function(e) {
                     if (e.target.tagName !== 'INPUT') {
                         this.querySelector('input').checked = true;
@@ -497,27 +601,9 @@
 
                 optionsContainer.appendChild(optionDiv);
             });
-
-            // Buton durumlarını güncelle
-            updateButtons();
-        }
-
-        function updateButtons() {
-            const prevBtn = document.getElementById('prevBtn');
-            const checkBtn = document.getElementById('checkBtn');
-            const nextBtn = document.getElementById('nextBtn');
-
-            // Önceki buton kontrolü
-            prevBtn.disabled = currentQuestionIndex === 0;
-
-            // Eğer bu soru cevaplanmışsa, "Sonraki" butonunu göster
-            if (answeredQuestions[currentQuestionIndex] !== null) {
-                checkBtn.classList.add('hidden');
-                nextBtn.classList.remove('hidden');
-            } else {
-                checkBtn.classList.remove('hidden');
-                nextBtn.classList.add('hidden');
-            }
+            
+            // Kontrol et butonunu göster
+            document.getElementById('checkBtn').classList.remove('hidden');
         }
 
         function checkAnswer() {

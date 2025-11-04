@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Akademik Araştırma Sınavı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            position: relative;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .option.selected {
+            background: #e7e9fc;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            animation: correctAnim 0.5s ease;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: incorrectAnim 0.5s ease;
+        }
+
+        @keyframes correctAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes incorrectAnim {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .results h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .score {
+            font-size: 64px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .score-details {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .feedback {
+            font-size: 18px;
+            color: #333;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .start-screen {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .start-screen h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .start-screen p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 10px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .info-box li::before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🎓 Akademik Araştırma Sınavı</h1>
+            <div id="questionCounter" class="question-number" style="color: white; margin-top: 10px; display: none;"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div id="startScreen" class="start-screen">
+            <h2>Sınava Hoş Geldiniz!</h2>
+            <p>Akademik araştırma yöntemleri hakkındaki bilginizi test etmeye hazır mısınız?</p>
+            <div class="info-box">
+                <ul>
+                    <li>Toplam <span id="totalQuestions">-</span> soru bulunmaktadır</li>
+                    <li>Her soruda 4 şık vardır</li>
+                    <li>Sorular ve şıklar rastgele sıralanmıştır</li>
+                    <li>Her soruyu cevapladıktan sonra doğru yanıtı görebilirsiniz</li>
+                    <li>Sınav sonunda toplam puanınızı göreceksiniz</li>
+                </ul>
+            </div>
+            <button class="btn btn-primary" id="startBtn" onclick="startQuiz()" disabled>Sorular Yükleniyor...</button>
+        </div>
+
+        <div id="quizScreen" class="content hidden">
+            <div class="question-container">
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question-text" id="questionText"></div>
+                <div class="options" id="optionsContainer"></div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()">← Önceki</button>
+                <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()">Cevabı Kontrol Et</button>
+                <button class="btn btn-primary hidden" id="nextBtn" onclick="nextQuestion()">Sonraki →</button>
+            </div>
+        </div>
+
+        <div id="resultsScreen" class="results hidden">
+            <h2>🎉 Sınav Tamamlandı!</h2>
+            <div class="score" id="finalScore"></div>
+            <div class="score-details" id="scoreDetails"></div>
+            <div class="feedback" id="feedbackText"></div>
+            <button class="btn btn-primary" onclick="restartQuiz()" style="margin-top: 30px;">Tekrar Dene</button>
+        </div>
+    </div>
+
+    <script>
+        // JSON verilerini doğrudan HTML içine gömelim (tüm sorular)
+        const questionsData = [
+    {"question": "Araştırma nedir?", "options": ["Kişisel gözlemlerle bilgi edinme sürecidir.", "Problemleri geçerli ve güvenilir çözümler bulmak için planlı ve sistematik yapılan bir süreçtir.", "Rastgele bilgi toplama etkinliğidir.", "Yalnızca önceki çalışmaları özetleme sürecidir."], "answer": "Problemleri geçerli ve güvenilir çözümler bulmak için planlı ve sistematik yapılan bir süreçtir."},
+    {"question": "Bilim nedir?", "options": ["Kişisel görüş ve inançların bütünüdür.", "Belli özelliklere sahip doğru, kanıta dayalı ve sistematik bilgilerin bütünüdür.", "Sadece doğa olaylarını açıklamaya çalışan felsefi yaklaşımdır.", "Deneysel olmayan teorik bilgilerin toplamıdır."], "answer": "Belli özelliklere sahip doğru, kanıta dayalı ve sistematik bilgilerin bütünüdür."},
+    {"question": "Bilimsel bilgi hangi özelliklere sahiptir?", "options": ["Öznel, değişken ve kişisel yorumlara dayalıdır.", "Nesneldir, genellenebilir, doğrulanabilir.", "Sadece tahmin ve sezgiye dayanır.", "Gizli, paylaşılmaz ve ölçülemezdir."], "answer": "Nesneldir, genellenebilir, doğrulanabilir."},
+    {"question": "Bilimsel yöntem neyi ifade eder?", "options": ["Sonuçları sezgisel olarak tahmin etme sürecini ifade eder.", "Güvenilir bilgi elde etme sürecini ifade eder.", "Sadece deney sonuçlarını raporlamayı ifade eder.", "Kaynakçayı düzenleme sürecini ifade eder."], "answer": "Güvenilir bilgi elde etme sürecini ifade eder."},
+    {"question": "Literatür taraması neden yapılır?", "options": ["Sadece kaynakça kısmını doldurmak için yapılır.", "Problemin kuramsal temelini oluşturmak, önceki araştırmaları görmek ve araştırma problemini daha doğru belirlemek için yapılır.", "Araştırma konusunu rastgele seçmek için yapılır.", "Yalnızca internet sitelerini listelemek için yapılır."], "answer": "Problemin kuramsal temelini oluşturmak, önceki araştırmaları görmek ve araştırma problemini daha doğru belirlemek için yapılır."},
+    {"question": "Literatür taraması ne zaman yapılır?", "options": ["Sadece araştırmanın sonunda yapılır.", "Araştırmanın başında yapılır ve araştırma sonuna kadar devam eder.", "Sadece makale yazılırken yapılır.", "Veri toplama bittikten sonra bir kez yapılır."], "answer": "Araştırmanın başında yapılır ve araştırma sonuna kadar devam eder."},
+    {"question": "Araştırma problemi nasıl olmalıdır?", "options": ["Mümkün olduğunca genel ve belirsiz olmalıdır.", "Açık olmalıdır, sınırlandırılmış olmalıdır.", "Çok geniş olmalı, sınırlandırılmamalıdır.", "Sadece araştırmacının kafasında net olması yeterlidir."], "answer": "Açık olmalıdır, sınırlandırılmış olmalıdır."},
+    {"question": "Paradigma ne demektir?", "options": ["Araştırmada kullanılan tek bir veri toplama aracıdır.", "Düşünce sisteminde büyük değişim anlamına gelen kavramdır.", "Sadece istatistiksel bir analiz türüdür.", "Bilimsel raporların yazım formatını ifade eder."], "answer": "Düşünce sisteminde büyük değişim anlamına gelen kavramdır."},
+    {"question": "Araştırma raporunun IMRAD açılımı nedir?", "options": ["I: İnceleme M: Model R: Rapor D: Değerlendirme", "I: Giriş M: Yöntem R: Bulgular D: Sonuç", "I: İçindekiler M: Metodoloji R: Referanslar D: Detaylar", "I: İstatistik M: Metot R: Rapor D: Deney"], "answer": "I: Giriş M: Yöntem R: Bulgular D: Sonuç"},
+    {"question": "Birincil kaynaklara örnek veriniz.", "options": ["Gazete haberleri, blog yazıları", "Makale, tez, araştırma raporu.", "Ansiklopedi maddeleri ve ders notları", "Ders kitapları ve popüler bilim dergileri"], "answer": "Makale, tez, araştırma raporu."},
+    {"question": "İkincil kaynaklara örnek veriniz.", "options": ["Ham veri setleri ve anket formları", "Derleme kitaplar, ders kitapları.", "Bilimsel makaleler ve tezler", "Saha notları ve gözlem formları"], "answer": "Derleme kitaplar, ders kitapları."},
+    {"question": "Bilimsel yazılarda amaç nedir?", "options": ["Bilgiyi açık, sistematik ve kanıta dayalı bir şekilde sunmaktır.", "Yazarın kişisel fikirlerini savunmaktır.", "Mümkün olduğunca süslü ve edebi bir dil kullanmaktır.", "Sadece daha önce yapılmış çalışmaları eleştirmektir."], "answer": "Bilgiyi açık, sistematik ve kanıta dayalı bir şekilde sunmaktır."},
+    {"question": "Bilimsel bilgi neden önemlidir?", "options": ["Çünkü sadece otorite kabul edilen kişilere dayanır.", "Çünkü nesneldir ve tekrar edilebilir.", "Çünkü yorumlanamaz ve değiştirilemez.", "Çünkü tamamen kişisel deneyimlere dayanır."], "answer": "Çünkü nesneldir ve tekrar edilebilir."},
+    {"question": "Araştırmada en güvenilir bilgi elde etme yolu nedir?", "options": ["Kulaktan dolma bilgiler toplamak.", "Sosyal medyadaki yorumları incelemek.", "Bilimsel yöntem.", "Sadece kişisel gözlemlere dayanmak."], "answer": "Bilimsel yöntem."},
+    {"question": "Araştırma amaçları nasıl olmalıdır?", "options": ["Genel ve belirsiz olmalıdır.", "Özel, açık ve kesin olmalıdır.", "Karmaşık ve ölçülemez olmalıdır.", "Sadece teorik olmalıdır."], "answer": "Özel, açık ve kesin olmalıdır."},
+    {"question": "Araştırma amaçlarını belirlemeden önce ne yapılmalıdır?", "options": ["İlgili konudaki mevcut literatür detaylı bir şekilde incelenmelidir.", "Rastgele hipotez oluşturulmalıdır.", "Sonuç bölümü yazılmalıdır.", "Veriler toplanmalıdır."], "answer": "İlgili konudaki mevcut literatür detaylı bir şekilde incelenmelidir."},
+    {"question": "Literatür taraması nedir?", "options": ["İlgili bilim dalındaki yayınları inceleyerek mevcut bilgileri gözden geçirme işidir.", "Yalnızca Google araması yapmaktır.", "Veri toplama sürecidir.", "Saha gözlemi yapmaktır."], "answer": "İlgili bilim dalındaki yayınları inceleyerek mevcut bilgileri gözden geçirme işidir."},
+    {"question": "Literatür taraması Google taraması mıdır?", "options": ["Evet, tamamen aynıdır.", "Hayır. İnternetteki kaynaklar akademik açıdan güvenilir olmayabilir.", "Evet, çünkü Google akademik bir platformdur.", "Kısmen, sadece Wikipedia için geçerlidir."], "answer": "Hayır. İnternetteki kaynaklar akademik açıdan güvenilir olmayabilir."},
+    {"question": "Literatür taraması araştırmacıya ne kazandırır?", "options": ["Konuyla ilgili geniş bilgi sağlar ve araştırma problemini netleştirir.", "Araştırmanın süresini uzatır.", "Veri toplamayı gereksiz kılar.", "Sadece kaynak sayısını artırır."], "answer": "Konuyla ilgili geniş bilgi sağlar ve araştırma problemini netleştirir."},
+    {"question": "Araştırma soruları neden önemlidir?", "options": ["Çünkü anket sorularını ve veri toplama sürecini yönlendirir.", "Çünkü sonuçların yerini alır.", "Çünkü literatür taramasını ortadan kaldırır.", "Çünkü kaynakçayı belirler."], "answer": "Çünkü anket sorularını ve veri toplama sürecini yönlendirir."},
+    {"question": "Spesifikasyon hatası ne zaman oluşur?", "options": ["Araştırma sorularını karşılamayan gereksiz sorular sorulduğunda oluşur.", "Tüm anket soruları doğru olduğunda oluşur.", "Veri eksik olduğunda oluşur.", "Hipotez doğru kurulduğunda oluşur."], "answer": "Araştırma sorularını karşılamayan gereksiz sorular sorulduğunda oluşur."},
+    {"question": "Pilot çalışma nedir?", "options": ["Gerçek araştırmadan önce küçük ve deneme amaçlı yapılan çalışmadır.", "Araştırmanın sonunda yapılan istatistiksel analizdir.", "Makale yazma sürecidir.", "Veri temizleme aşamasıdır."], "answer": "Gerçek araştırmadan önce küçük ve deneme amaçlı yapılan çalışmadır."},
+    {"question": "Pilot çalışmanın faydası nedir?", "options": ["Hataları erken fark etmeyi ve düzeltmeyi sağlar.", "Veri analizini hızlandırır.", "Katılımcı sayısını artırır.", "Kaynakçayı sadeleştirir."], "answer": "Hataları erken fark etmeyi ve düzeltmeyi sağlar."},
+    {"question": "Literatürün iyi olması için kaynaklar nasıl olmalıdır?", "options": ["Akademik yayınlardan oluşmalıdır.", "Sosyal medya paylaşımlarından seçilmelidir.", "Blog yazılarından alınmalıdır.", "Yalnızca gazete haberlerine dayanmalıdır."], "answer": "Akademik yayınlardan oluşmalıdır."},
+    {"question": "Literatür taraması sadece özetleme midir?", "options": ["Hayır. Aynı zamanda değerlendirme ve sentez de yapılmalıdır.", "Evet, sadece özetleme yapılır.", "Evet, yalnızca sonuç kısmı alınır.", "Kısmen, sadece tanım yapılır."], "answer": "Hayır. Aynı zamanda değerlendirme ve sentez de yapılmalıdır."},
+    {"question": "Bilimsel araştırmalarda etik neyle ilgilenir?", "options": ["Doğru, yanlış, iyi ve kötü davranışları belirleyen ahlaki standartlarla ilgilenir.", "Araştırmanın finansmanını düzenler.", "Yalnızca anket sorularını belirler.", "Sonuçların doğruluğunu ölçer."], "answer": "Doğru, yanlış, iyi ve kötü davranışları belirleyen ahlaki standartlarla ilgilenir."},
+    {"question": "İntihal ne demektir?", "options": ["Başkalarının fikirlerini kaynak göstermeden kendi fikri gibi sunmaktır.", "Kaynakları fazla göstermek.", "Kendi çalışmasından alıntı yapmak.", "Kaynakçayı yanlış yazmak."], "answer": "Başkalarının fikirlerini kaynak göstermeden kendi fikri gibi sunmaktır."},
+    {"question": "Bir araştırmacı hangi etik ilkelere uymalıdır?", "options": ["Dürüstlük, açıklık ve güvenilirlik ilkelerine uymalıdır.", "Kaynakları gizlemelidir.", "Kişisel çıkarı ön planda tutmalıdır.", "Sonuçları değiştirmelidir."], "answer": "Dürüstlük, açıklık ve güvenilirlik ilkelerine uymalıdır."},
+    {"question": "Başlık en fazla kaç kelime olmalıdır?", "options": ["10 kelime", "15 kelime", "20 kelime", "25 kelime"], "answer": "15 kelime"},
+    {"question": "Başlık neyi yapmalıdır?", "options": ["Makaleyi doğrudan anlatmalıdır.", "Sadece genel bir fikir vermelidir.", "Süsleyici ifadeler içermelidir.", "Kısaltmalarla dolu olmalıdır."], "answer": "Makaleyi doğrudan anlatmalıdır."},
+    {"question": "Özet en fazla kaç kelimeden oluşur?", "options": ["100 kelime", "200 kelime", "300 kelime", "400 kelime"], "answer": "300 kelime"},
+    {"question": "Özet neyi içermelidir?", "options": ["Çalışmanın tümünü, koşullarını, rakamları ve sonuçlarını içermelidir.", "Sadece giriş kısmını içermelidir.", "Kaynakça bilgilerini içermelidir.", "Yazarın kişisel yorumlarını içermelidir."], "answer": "Çalışmanın tümünü, koşullarını, rakamları ve sonuçlarını içermelidir."},
+    {"question": "Özet bölümünde giriş cümleleri ve genel bilgiler yazılır mı?", "options": ["Hayır, kesinlikle yazılmaz.", "Evet, yazılmalıdır.", "Sadece gerekli görüldüğünde yazılabilir.", "Kısmen, eğer kısa ise yazılabilir."], "answer": "Hayır, kesinlikle yazılmaz."},
+    {"question": "Anahtar kelime sayısı kaç olmalıdır?", "options": ["1-2 kelime", "3-5 kelime", "5-10 kelime", "10-15 kelime"], "answer": "3-5 kelime"},
+    {"question": "Anahtar kelimeler neden önemlidir?", "options": ["Makalenin bulunmasını ve erişimi kolaylaştırır.", "Makalenin uzunluğunu artırır.", "Makalenin yazarını gizler.", "Kaynakçayı düzenler."], "answer": "Makalenin bulunmasını ve erişimi kolaylaştırır."},
+    {"question": "Giriş bölümünde neler yapılmalıdır?", "options": ["Konu hakkında temel bilgi verilmeli ve literatür özeti sunulmalıdır.", "Yalnızca sonuçlar verilmelidir.", "Deneysel yöntemler anlatılmalıdır.", "Kişisel görüşler belirtilmelidir."], "answer": "Konu hakkında temel bilgi verilmeli ve literatür özeti sunulmalıdır."},
+    {"question": "Girişin ilk cümlesi ne içermelidir?", "options": ["Problemin veya hipotezin açık ifadesini içermelidir.", "Yazarın teşekkürlerini içermelidir.", "Sonuçların özetini içermelidir.", "Anahtar kelimeleri içermelidir."], "answer": "Problemin veya hipotezin açık ifadesini içermelidir."},
+    {"question": "Materyal ve metot bölümü neden önemlidir?", "options": ["Çalışmanın en önemli bölümüdür ve tekrar edilebilirliği sağlamalıdır.", "Sadece kullanılan kaynakları açıklar.", "Tartışmaları özetler.", "Sonuç kısmının tekrarını yapar."], "answer": "Çalışmanın en önemli bölümüdür ve tekrar edilebilirliği sağlamalıdır."},
+    {"question": "Materyal metod bölümünde hangi bilgiler verilmelidir?", "options": ["Kullanılan yöntem, parametreler, adımlar, veri tabanı vs.", "Yalnızca araştırmacıların isimleri.", "Grafikler ve tablolar.", "Sonuçların yorumu."], "answer": "Kullanılan yöntem, parametreler, adımlar, veri tabanı vs."},
+    {"question": "Bulgular bölümünde ne yapılır?", "options": ["Sadece elde edilen bulgular verilir, yorum yapılmaz.", "Sonuçlar tartışılır.", "Yazarın kişisel yorumları eklenir.", "Önceki çalışmalar özetlenir."], "answer": "Sadece elde edilen bulgular verilir, yorum yapılmaz."},
+    {"question": "Bulgular bölümünde tablo ve grafikler nasıl olmalıdır?", "options": ["Okuyan kişi tabloya baktığında neyi anlattığını anlamalıdır.", "Sadece sayılardan oluşmalıdır.", "Açıklama içermemelidir.", "Renkli ama başlıksız olmalıdır."], "answer": "Okuyan kişi tabloya baktığında neyi anlattığını anlamalıdır."},
+    {"question": "Tartışma ve sonuçlarda ne yapılır?", "options": ["Elde edilen sonuçlar açıklanır ve neden önemli oldukları ifade edilir.", "Sadece bulgular tekrar edilir.", "Kaynakça düzenlenir.", "Yazarın biyografisi verilir."], "answer": "Elde edilen sonuçlar açıklanır ve neden önemli oldukları ifade edilir."},
+    {"question": "Kaynakça kısmında nelere dikkat edilmelidir?", "options": ["Yazım kurallarına ve kısaltmalara dikkat edilmelidir.", "Sadece yazar isimleri verilmelidir.", "Tüm kaynaklar karışık sırayla yazılmalıdır.", "Yalnızca internet siteleri eklenmelidir."], "answer": "Yazım kurallarına ve kısaltmalara dikkat edilmelidir."},
+    {"question": "Bibliyometri nedir?", "options": ["Bilimsel yayınların nicel olarak analiz edilmesi ve eğilimlerin incelenmesidir.", "Yayınların sadece yazar adlarına göre sıralanmasıdır.", "Bilimsel araştırma konularının özetlenmesidir.", "Sadece istatistiksel verilerin toplanmasıdır."], "answer": "Bilimsel yayınların nicel olarak analiz edilmesi ve eğilimlerin incelenmesidir."},
+    {"question": "Bibliyometri neyi ölçer?", "options": ["Hangi yazar, dergi, ülke veya alanın daha etkili olduğunu ölçer.", "Araştırma konularının başlık uzunluğunu ölçer.", "Makalelerin yazım dilini ölçer.", "Yazarların sosyal medya paylaşımlarını ölçer."], "answer": "Hangi yazar, dergi, ülke veya alanın daha etkili olduğunu ölçer."},
+    {"question": "Bibliyometrik analiz hangi iki temel yaklaşım içerir?", "options": ["Performans analizi ve bilimsel haritalama.", "Veri toplama ve istatistiksel değerlendirme.", "Hipotez oluşturma ve test etme.", "Kaynakça yönetimi ve atıf denetimi."], "answer": "Performans analizi ve bilimsel haritalama."},
+    {"question": "Performans analizi neyi inceler?", "options": ["Yazar, dergi veya kurumun yayın sayısı ve atıf sayısı gibi metrikleri inceler.", "Yazarların mesleki geçmişini inceler.", "Okuyucuların yorumlarını inceler.", "Makale özetlerinin uzunluğunu inceler."], "answer": "Yazar, dergi veya kurumun yayın sayısı ve atıf sayısı gibi metrikleri inceler."},
+    {"question": "Bilimsel haritalama neyi ortaya koyar?", "options": ["Araştırmacılar ve kavramlar arasındaki ilişkileri grafiksel olarak ortaya koyar.", "Yayınların tarih sırasını gösterir.", "Makale başlıklarının sıklığını ölçer.", "Dergilerin etki faktörünü hesaplar."], "answer": "Araştırmacılar ve kavramlar arasındaki ilişkileri grafiksel olarak ortaya koyar."},
+    {"question": "Bibliyometrik analiz neden gereklidir?", "options": ["Çünkü literatür çok hızlı büyüyor ve sayısal olarak değerlendirme ihtiyacı var.", "Çünkü tüm makaleleri manuel olarak okumak imkansızdır.", "Çünkü bilimsel yazım kuralları sürekli değişmektedir.", "Çünkü bibliyografi oluşturmak zaman alır."], "answer": "Çünkü literatür çok hızlı büyüyor ve sayısal olarak değerlendirme ihtiyacı var."},
+    {"question": "Co-authorship analizi neyi gösterir?", "options": ["Yazarlar veya kurumlar arasındaki işbirliği ağlarını gösterir.", "Makale özetlerinin benzerliğini gösterir.", "Dergilerin yayın sıklığını gösterir.", "Atıf oranlarının zaman içindeki değişimini gösterir."], "answer": "Yazarlar veya kurumlar arasındaki işbirliği ağlarını gösterir."},
+    {"question": "Co-occurrence analizi neyi gösterir?", "options": ["Anahtar kelimelerin birlikte kullanım sıklığını ve tematik kümeleri gösterir.", "Yazarların aynı dönemde çalışıp çalışmadığını gösterir.", "Dergilerin yıllık yayın sayısını gösterir.", "Makalelerdeki kaynakça sırasını gösterir."], "answer": "Anahtar kelimelerin birlikte kullanım sıklığını ve tematik kümeleri gösterir."},
+    {"question": "Citation analizi neyi inceler?", "options": ["Hangi yayınların daha çok atıf aldığını inceler.", "Yazarların yazım stillerini inceler.", "Makale başlıklarının uzunluğunu inceler.", "Okuyucu sayısını inceler."], "answer": "Hangi yayınların daha çok atıf aldığını inceler."},
+    {"question": "Co-citation analizi neyi ifade eder?", "options": ["İki yayının üçüncü bir yayın tarafından birlikte atıf alması durumudur.", "Yazarların aynı dergide yayın yapmasıdır.", "Makale başlıklarının aynı kelimeleri içermesidir.", "Farklı alanlarda yazılan makalelerin karşılaştırılmasıdır."], "answer": "İki yayının üçüncü bir yayın tarafından birlikte atıf alması durumudur."},
+    {"question": "Bibliographic coupling ne demektir?", "options": ["İki yayının aynı kaynaklara atıf yapmasıdır.", "Yazarların aynı kurumda çalışmasıdır.", "Dergilerin benzer konularda makale yayımlamasıdır.", "Atıf sayısının eşit olmasıdır."], "answer": "İki yayının aynı kaynaklara atıf yapmasıdır."},
+    {"question": "VOSviewer ne için kullanılır?", "options": ["Bibliyometrik ağ haritaları oluşturmak ve görselleştirmek için kullanılır.", "Makale özetlerini yazmak için kullanılır.", "Kaynakçayı biçimlendirmek için kullanılır.", "İstatistiksel analiz yapmak için kullanılır."], "answer": "Bibliyometrik ağ haritaları oluşturmak ve görselleştirmek için kullanılır."},
+    {"question": "Bibliyometrik analiz hangi durumlarda kullanılır?", "options": ["Tez konusu belirlerken alanın genel haritasını çıkarmak için kullanılır.", "Araştırma sonuçlarını yazmak için kullanılır.", "Kaynakça oluşturmak için kullanılır.", "Makale başlığı seçmek için kullanılır."], "answer": "Tez konusu belirlerken alanın genel haritasını çıkarmak için kullanılır."},
+    {"question": "Bibliyometrik analiz sürecinin ilk adımı nedir?", "options": ["Araştırma konusunun belirlenmesidir.", "Veri analizi yapılmasıdır.", "Sonuçların raporlanmasıdır.", "Kaynakçanın yazılmasıdır."], "answer": "Araştırma konusunun belirlenmesidir."},
+    {"question": "Full counting ile fractional counting arasındaki fark nedir?", "options": ["Full counting her bağlantıyı tam sayar, fractional counting katkıya göre oranlar.", "Full counting sadece yazar sayısını gösterir.", "Fractional counting atıf sayısını gizler.", "İkisi de aynı yöntemi ifade eder."], "answer": "Full counting her bağlantıyı tam sayar, fractional counting katkıya göre oranlar."}
+];
+
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answeredQuestions = new Array();
+
+        // Soruları yükle
+        function loadQuestions() {
+            try {
+                // Soruları rastgele sırala
+                questions = shuffleArray(questionsData);
+                // Her sorunun şıklarını rastgele sırala
+                questions.forEach(q => {
+                    const correctAnswer = q.answer;
+                    q.options = shuffleArray(q.options);
+                    q.correctAnswer = correctAnswer;
+                });
+                // Toplam soru sayısını göster
+                document.getElementById('totalQuestions').textContent = questions.length;
+                // Başla butonunu aktif et
+                const startBtn = document.getElementById('startBtn');
+                startBtn.disabled = false;
+                startBtn.textContent = 'Sınava Başla';
+            } catch (error) {
+                console.error('Sorular yüklenirken hata oluştu:', error);
+                alert('Sorular yüklenirken bir hata oluştu. Lütfen sayfayı yenileyin.');
+                const startBtn = document.getElementById('startBtn');
+                startBtn.textContent = 'Yükleme Hatası - Sayfayı Yenileyin';
+            }
+        }
+
+        // Array'i rastgele karıştır (Fisher-Yates algoritması)
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function startQuiz() {
+            if (questions.length === 0) {
+                alert('Sorular henüz yüklenmedi. Lütfen bir saniye bekleyip tekrar deneyin.');
+                return;
+            }
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            document.getElementById('questionCounter').style.display = 'block';
+            answeredQuestions = new Array(questions.length).fill(null);
+            currentQuestionIndex = 0;
+            score = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestionIndex];
+            const questionNumber = document.getElementById('questionNumber');
+            const questionText = document.getElementById('questionText');
+            const optionsContainer = document.getElementById('optionsContainer');
+            const questionCounter = document.getElementById('questionCounter');
+            const progressBar = document.getElementById('progressBar');
+
+            questionCounter.textContent = `Soru ${currentQuestionIndex + 1} / ${questions.length}`;
+            questionNumber.textContent = `Soru ${currentQuestionIndex + 1}`;
+            questionText.textContent = question.question;
+
+            // İlerleme çubuğunu güncelle
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBar.style.width = progress + '%';
+
+            // Şıkları göster
+            optionsContainer.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.innerHTML = `
+                    <input type="radio" name="answer" id="option${index}" value="${option}">
+                    <label for="option${index}" style="cursor: pointer; flex: 1;">${option}</label>
+                `;
+                
+                // Eğer bu soru daha önce cevaplanmışsa, seçimi göster
+                if (answeredQuestions[currentQuestionIndex] === option) {
+                    optionDiv.classList.add('selected');
+                    optionDiv.querySelector('input').checked = true;
+                }
+
+                optionDiv.addEventListener('click', function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        this.querySelector('input').checked = true;
+                    }
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            // Buton durumlarını güncelle
+            updateButtons();
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const checkBtn = document.getElementById('checkBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            // Önceki buton kontrolü
+            prevBtn.disabled = currentQuestionIndex === 0;
+
+            // Eğer bu soru cevaplanmışsa, "Sonraki" butonunu göster
+            if (answeredQuestions[currentQuestionIndex] !== null) {
+                checkBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+            } else {
+                checkBtn.classList.remove('hidden');
+                nextBtn.classList.add('hidden');
+            }
+        }
+
+        function checkAnswer() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            
+            if (!selectedOption) {
+                alert('Lütfen bir şık seçin!');
+                return;
+            }
+
+            const userAnswer = selectedOption.value;
+            const correctAnswer = questions[currentQuestionIndex].correctAnswer;
+            
+            // Kullanıcının cevabını kaydet
+            answeredQuestions[currentQuestionIndex] = userAnswer;
+
+            // Tüm şıkları kontrol et ve renklendir
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                const optionValue = option.querySelector('input').value;
+                option.style.pointerEvents = 'none'; // Tıklamayı engelle
+                
+                if (optionValue === correctAnswer) {
+                    option.classList.add('correct');
+                } else if (optionValue === userAnswer && userAnswer !== correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            // Puan hesapla
+            if (userAnswer === correctAnswer) {
+                score++;
+            }
+
+            // Butonları güncelle
+            document.getElementById('checkBtn').classList.add('hidden');
+            document.getElementById('nextBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+
+            const percentage = ((score / questions.length) * 100).toFixed(1);
+            document.getElementById('finalScore').textContent = `${percentage}%`;
+            document.getElementById('scoreDetails').textContent = 
+                `${questions.length} sorudan ${score} tanesini doğru cevapladınız.`;
+
+            let feedback = '';
+            if (percentage >= 90) {
+                feedback = '🌟 Mükemmel! Akademik araştırma konusunda harika bir bilgiye sahipsiniz!';
+            } else if (percentage >= 70) {
+                feedback = '👍 Çok iyi! Konuyu iyi biliyorsunuz.';
+            } else if (percentage >= 50) {
+                feedback = '📚 Fena değil! Biraz daha çalışma ile başarılı olabilirsiniz.';
+            } else {
+                feedback = '💪 Tekrar deneyin! Konuyu biraz daha çalışmanız gerekebilir.';
+            }
+
+            document.getElementById('feedbackText').textContent = feedback;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answeredQuestions = [];
+            
+            // Soruları ve şıkları tekrar karıştır
+            questions = shuffleArray(questions);
+            questions.forEach(q => {
+                q.options = shuffleArray(q.options);
+            });
+
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+            document.getElementById('questionCounter').style.display = 'none';
+        }
+
+        // Sayfa yüklendiğinde soruları yükle
+        window.onload = loadQuestions;
+    </script>
+</body>
+</html>
+

@@ -1,0 +1,556 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Veri Bilimi Sınavı</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            max-width: 900px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+
+        .header h1 {
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .progress-bar {
+            background: rgba(255, 255, 255, 0.3);
+            height: 8px;
+            border-radius: 4px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            background: white;
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        .content {
+            padding: 40px;
+        }
+
+        .question-container {
+            margin-bottom: 30px;
+        }
+
+        .question-number {
+            color: #667eea;
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+
+        .question-text {
+            font-size: 20px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 25px;
+            line-height: 1.5;
+        }
+
+        .question-image {
+            max-width: 100%;
+            height: auto;
+            border-radius: 12px;
+            margin: 20px 0;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .option {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 18px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            font-size: 16px;
+            position: relative;
+        }
+
+        .option:hover {
+            background: #e9ecef;
+            border-color: #667eea;
+            transform: translateX(5px);
+        }
+
+        .option input[type="radio"] {
+            margin-right: 15px;
+            width: 20px;
+            height: 20px;
+            cursor: pointer;
+        }
+
+        .option.selected {
+            background: #e7e9fc;
+            border-color: #667eea;
+        }
+
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            animation: correctAnim 0.5s ease;
+        }
+
+        .option.incorrect {
+            background: #f8d7da;
+            border-color: #dc3545;
+            animation: incorrectAnim 0.5s ease;
+        }
+
+        @keyframes correctAnim {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes incorrectAnim {
+            0% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+            100% { transform: translateX(0); }
+        }
+
+        .buttons {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+            justify-content: space-between;
+        }
+
+        .btn {
+            padding: 15px 35px;
+            border: none;
+            border-radius: 10px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn-secondary {
+            background: #6c757d;
+            color: white;
+        }
+
+        .btn-secondary:hover {
+            background: #5a6268;
+            transform: translateY(-2px);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .results {
+            text-align: center;
+            padding: 40px;
+        }
+
+        .results h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 30px;
+        }
+
+        .score {
+            font-size: 64px;
+            font-weight: bold;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .score-details {
+            font-size: 20px;
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .feedback {
+            font-size: 18px;
+            color: #333;
+            margin-top: 20px;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: inline-block;
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        .start-screen {
+            text-align: center;
+            padding: 60px 40px;
+        }
+
+        .start-screen h2 {
+            font-size: 32px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .start-screen p {
+            font-size: 18px;
+            color: #666;
+            margin-bottom: 40px;
+            line-height: 1.6;
+        }
+
+        .info-box {
+            background: #f8f9fa;
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 30px;
+            text-align: left;
+        }
+
+        .info-box ul {
+            list-style: none;
+            padding-left: 0;
+        }
+
+        .info-box li {
+            padding: 10px 0;
+            font-size: 16px;
+            color: #555;
+        }
+
+        .info-box li::before {
+            content: "✓ ";
+            color: #667eea;
+            font-weight: bold;
+            margin-right: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📊 Veri Bilimi Sınavı</h1>
+            <div id="questionCounter" class="question-number" style="color: white; margin-top: 10px; display: none;"></div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressBar"></div>
+            </div>
+        </div>
+
+        <div id="startScreen" class="start-screen">
+            <h2>Sınava Hoş Geldiniz!</h2>
+            <p>Veri Bilimi konusundaki bilginizi test etmeye hazır mısınız?</p>
+            <div class="info-box">
+                <ul>
+                    <li>Toplam <span id="totalQuestions">25</span> soru bulunmaktadır</li>
+                    <li>Her soruda 4-5 şık vardır</li>
+                    <li>Sorular ve şıklar rastgele sıralanmıştır</li>
+                    <li>Her soruyu cevapladıktan sonra doğru yanıtı görebilirsiniz</li>
+                    <li>Sınav sonunda toplam puanınızı göreceksiniz</li>
+                </ul>
+            </div>
+            <button class="btn btn-primary" onclick="startQuiz()">Sınava Başla</button>
+        </div>
+
+        <div id="quizScreen" class="content hidden">
+            <div class="question-container">
+                <div class="question-number" id="questionNumber"></div>
+                <div class="question-text" id="questionText"></div>
+                <img id="questionImage" class="question-image hidden" src="" alt="Soru görseli">
+                <div class="options" id="optionsContainer"></div>
+            </div>
+            <div class="buttons">
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()">← Önceki</button>
+                <button class="btn btn-primary" id="checkBtn" onclick="checkAnswer()">Cevabı Kontrol Et</button>
+                <button class="btn btn-primary hidden" id="nextBtn" onclick="nextQuestion()">Sonraki →</button>
+            </div>
+        </div>
+
+        <div id="resultsScreen" class="results hidden">
+            <h2>🎉 Sınav Tamamlandı!</h2>
+            <div class="score" id="finalScore"></div>
+            <div class="score-details" id="scoreDetails"></div>
+            <div class="feedback" id="feedbackText"></div>
+            <button class="btn btn-primary" onclick="restartQuiz()" style="margin-top: 30px;">Tekrar Dene</button>
+        </div>
+    </div>
+
+    <script>
+        const questionsData = [
+            {"question": "Aşağıdaki bilgilerden hangisi yanlıştır?", "options": ["En kısa mesafeye sahip kümeler önce birleştirilir.", "En son birleşen kümelerin birbirine uzaklığı en fazladır.", "Her yatay çizgi bir kümeyi temsil eder.", "En yüksek yatay çizgi kümeler arası en kısa mesafedir.", "Dikey eksen kümeler arası uzaklığı gösterir."], "answer": "En yüksek yatay çizgi kümeler arası en kısa mesafedir.", "image": "1ve2ninbasliksoruus.png"},
+            {"question": "Aşağıdaki bilgilerden hangisi yanlıştır?", "options": ["İç çeyrek aralığı (IQR) = 3. ve 1. çeyrek farkıdır.", "Kutu grafiğinde aykırı değerler nokta ile gösterilir.", "Kutu grafiğinde medyan, kutu içinde yatay çizgiyle gösterilir.", "Kutu grafiğinde maksimum ve minimum değerler uç çizgilerle gösterilir.", "Kutu grafiğinde ortalama değer orta noktadır."], "answer": "Kutu grafiğinde ortalama değer orta noktadır."},
+            {"question": "Aşağıdakilerden hangisi doğrudur?", "options": ["Yalnız II", "I ve II", "II, III ve IV", "II, III, IV ve V", "I, II, III, IV ve V"], "answer": "II, III, IV ve V", "note": "I. Pandas tek boyutlu değildir. II. DataFrame çok boyutlu tablolardır. III. Pandas metin dosyalarını okuma komutlarını destekler. IV. NumPy ile Pandas birlikte kullanılabilir. V. DataFrame verileri üzerinde filtreleme işlemleri yapılabilir."},
+            {"question": "Hangi yöntem, Pandas kullanılarak DataFrame oluşturmak için kullanılır?", "options": ["make_dataFrame()", "pandas.dataframe()", "DataFrame.create()", "pandas.create_df()", "pd.DataFrame()"], "answer": "pd.DataFrame()"},
+            {"question": "Verilen kutu grafiğine göre aşağıdakilerden hangisi yanlıştır?", "options": ["Minimum değer 7'dir.", "Çeyrekler arası açıklık (IQR) 5'tir.", "Aykırı değer sayısı 2'dir.", "Medyan değeri 10'dur.", "Maksimum değer 15'tir."], "answer": "Aykırı değer sayısı 2'dir.", "image": "5soru.png"},
+            {"question": "Aşağıdakilerden hangisi yapısal veriye örnektir?", "options": ["Metin belgeleri", "CSV dosyaları", "Resim dosyaları", "Video dosyaları", "PDF dosyaları"], "answer": "CSV dosyaları"},
+            {"question": "Aşağıdakilerden hangisi nümerik bir veri örneğidir?", "options": ["İlçe adı bilgisi", "Telefon numarası", "Kullanıcı cinsiyeti", "Kategori etiketleri", "Ad-soyad bilgisi"], "answer": "Telefon numarası"},
+            {"question": "Aşağıdaki korelasyon grafiklerinden hangisinde iki değişken arasında bir ilişki yoktur?", "options": ["A", "B", "C", "D", "E"], "answer": "D", "image": "8şıklar.png"},
+            {"question": "Aşağıdakilerden hangisi yanlıştır?", "options": ["Kişi sayısının artması toplam tutarı orantılı şekilde artırır.", "Bahşiş ile toplam tutar arasında pozitif bir korelasyon vardır.", "Bahşiş ile kişi sayısı arasında pozitif korelasyon vardır.", "Toplam tutar grafiği pozitif yönlü bir korelasyondur.", "Çapraz çubuklar dağılım grafiğini ifade eder."], "answer": "Bahşiş ile kişi sayısı arasında pozitif korelasyon vardır.", "image": "9ve10 soru.png"},
+            {"question": "Aşağıdakilerden hangisi yanlıştır?", "options": ["En yüksek ilişki toplam tutar ile bahşiş arasındadır.", "En düşük ilişki yemek yiyen kişi sayısı ile bahşiş arasındadır.", "En yüksek ilişki yemek yiyen kişi sayısı ile toplam tutar arasındadır.", "Toplam tutar grafiği pozitif korelasyondur.", "Yemek yiyen kişi sayısı grafiği pozitif korelasyondur."], "answer": "En yüksek ilişki yemek yiyen kişi sayısı ile toplam tutar arasındadır.", "image": "9ve10 soru.png"},
+            {"question": "Satın alma zamanı ile gün-saat bilgileri içeren bir tablo oluşturulmuştur. Buna göre aşağıdaki ifadelerden hangisi doğrudur?", "options": ["I ve II", "III ve IV", "II ve IV", "II, IV ve V", "I, III ve V"], "answer": "II, IV ve V", "note": "I. Satın alım saati bilgi tipi sayısaldır. II. Satın alım zamanı kategorik veridir. III. Satın alım tarihi metin tipinde olabilir. IV. Satın alım zamanı datetime tipinde olabilir. V. Saat bilgisi string olabilir."},
+            {"question": "Veri Biliminde aşağıdaki bilim dallarından hangisi yer almaz?", "options": ["Matematik ve İstatistik", "Bilgisayar Bilimleri", "Bilimsel Araştırmalar", "Alan Bilgisi (Domain Knowledge)", "Makine Öğrenmesi"], "answer": "Bilimsel Araştırmalar"},
+            {"question": "Aşağıdaki tabloya göre kişi başına düşen GSYİH en yüksek olan ülke hangisidir?", "options": ["B > A > C", "A > B > C", "C > B > A", "A > C > B", "C > A > B"], "answer": "B > A > C", "image": "13baş.png"},
+            {"question": "Aşağıdakilerden hangisi Veri Manipülasyonu adımlarından biridir?", "options": ["Verilerin son halini kayıt altına almak", "Verileri düzenlemek", "Verileri birleştirmek ve fazlalıkları atmak", "Verileri betimlemek", "Makine öğrenme yöntemiyle yararlı bilgileri ortaya çıkarmak"], "answer": "Verileri birleştirmek ve fazlalıkları atmak"},
+            {"question": "Hangisi bir Pandas DataFrame'den belirli satırları seçmek için kullanılır?", "options": ["choose_row()", "select_row()", "DataFrame.row()", "filter_row()", "loc[]"], "answer": "loc[]"},
+            {"question": "Aşağıda belirtilen ifadelerden hangisi doğrudur?", "options": ["Tüm Veri Bilimi araştırmaları mutlaka bir veri kümesiyle başlar.", "Geleceğe ilişkin kararları almak için Python'da yapay zekâ ve diğer araçlar kullanmak normdandır.", "Veri Bilimi süreci tamamen otomatik ve makineseldir.", "Veri Bilimi yalnızca nicel (sayısal) verilerle ilgilenir.", "Veri Bilimi, herhangi bir verinin literatüre katkı sağlama sürecidir."], "answer": "Geleceğe ilişkin kararları almak için Python'da yapay zekâ ve diğer araçlar kullanmak normdandır."},
+            {"question": "Aşağıdakilerden hangisi bir veri kümesi analiz edilebilir?", "options": ["Ortalama hesaplama", "Standart sapma hesaplama", "Korelasyon analizi", "Medyan bulma", "Hepsi"], "answer": "Hepsi"},
+            {"question": "Hangisi veri görselleştirmede en çok kullanılan Python kütüphanesidir?", "options": ["Pandas", "TensorFlow", "Scikit-learn", "Matplotlib"], "answer": "Matplotlib"},
+            {"question": "Hangisi veri bilimi yaşam döngüsünde yer almaz?", "options": ["Veriyi keşfetmek ve strateji belirlemek", "Model seçimi", "Veri toplama", "Veriyi analiz edip bilgi çıkarmak", "Modeli deploy etmek"], "answer": "Veriyi keşfetmek ve strateji belirlemek"},
+            {"question": "Aşağıdakilerden hangisi yapısal olmayan veriye örnektir?", "options": ["SQL veritabanları", "CSV dosyaları", "Excel tabloları", "XML dosyaları", "Video dosyaları"], "answer": "Video dosyaları"},
+            {"question": "Veri görselleştirmede, kategorik verilerin oranlarını göstermek için en uygun grafik türü aşağıdakilerden hangisidir?", "options": ["Çizgi grafiği (Line chart)", "Pasta grafiği (Pie chart)", "Isı grafiği (Heatmap)", "Kutu grafiği (Boxplot)", "Histogram"], "answer": "Pasta grafiği (Pie chart)"},
+            {"question": "Veri Bilimi sürecinde aşağıdaki adımların doğru sıralaması hangisidir?", "options": ["Veri Toplama → Veri Görselleştirme → Veri Manipülasyonu → Model Kurma", "Veri Görselleştirme → Veri Toplama → Model Kurma → Model Doğrulama", "Veri Toplama → Veri Manipülasyonu → Veri Görselleştirme → Model Kurma", "Veri Toplama → Veri Manipülasyonu → Model Kurma → Model Doğrulama", "Veri Toplama → Model Kurma → Veri Görselleştirme → Model Doğrulama"], "answer": "Veri Toplama → Veri Manipülasyonu → Model Kurma → Model Doğrulama"},
+            {"question": "Aşağıdakilerden hangisi bir Veri Bilimcinin görevidir?", "options": ["Yenilikleri izleyerek en güncel teknolojileri kullanmak", "Takım içi görevleri planlamak", "Verilen son kararlara göre çalışanlarla yeni görevler belirlemek", "Tüm raporları birim yöneticisine sunmak", "Sadece görselleştirme yapmak"], "answer": "Yenilikleri izleyerek en güncel teknolojileri kullanmak"},
+            {"question": "Aşağıdakilerden hangisi veri manipülasyonu işlemlerinden biridir?", "options": ["Yeni veri eklemek", "Verileri silmek", "Yanlış formatlı verileri düzenlemek", "Yeni veri seti oluşturmak", "Modelin doğruluğunu test etmek"], "answer": "Yanlış formatlı verileri düzenlemek"},
+            {"question": "Aşağıdakilerden hangisi, bir zaman serisindeki değişiklikleri göstermek için kullanılır?", "options": ["Pasta grafiği (Pie chart)", "Çizgi grafiği (Line chart)", "Kutu grafiği (Boxplot)", "Isı grafiği (Heatmap)", "Histogram"], "answer": "Çizgi grafiği (Line chart)"}
+        ];
+
+        let questions = [];
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let answeredQuestions = new Array();
+
+        function loadQuestions() {
+            // Soruları rastgele sırala
+            questions = shuffleArray(questionsData);
+            // Her sorunun şıklarını rastgele sırala
+            questions.forEach(q => {
+                const correctAnswer = q.answer;
+                q.options = shuffleArray(q.options);
+                q.correctAnswer = correctAnswer;
+            });
+            document.getElementById('totalQuestions').textContent = questions.length;
+        }
+
+        function shuffleArray(array) {
+            const newArray = [...array];
+            for (let i = newArray.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [newArray[i], newArray[j]] = [newArray[j], newArray[i]];
+            }
+            return newArray;
+        }
+
+        function startQuiz() {
+            document.getElementById('startScreen').classList.add('hidden');
+            document.getElementById('quizScreen').classList.remove('hidden');
+            document.getElementById('questionCounter').style.display = 'block';
+            answeredQuestions = new Array(questions.length).fill(null);
+            currentQuestionIndex = 0;
+            score = 0;
+            showQuestion();
+        }
+
+        function showQuestion() {
+            const question = questions[currentQuestionIndex];
+            const questionNumber = document.getElementById('questionNumber');
+            const questionText = document.getElementById('questionText');
+            const questionImage = document.getElementById('questionImage');
+            const optionsContainer = document.getElementById('optionsContainer');
+            const questionCounter = document.getElementById('questionCounter');
+            const progressBar = document.getElementById('progressBar');
+
+            questionCounter.textContent = `Soru ${currentQuestionIndex + 1} / ${questions.length}`;
+            questionNumber.textContent = `Soru ${currentQuestionIndex + 1}`;
+            questionText.textContent = question.question;
+
+            // Görsel varsa göster
+            if (question.image) {
+                questionImage.src = question.image;
+                questionImage.classList.remove('hidden');
+            } else {
+                questionImage.classList.add('hidden');
+            }
+
+            const progress = ((currentQuestionIndex + 1) / questions.length) * 100;
+            progressBar.style.width = progress + '%';
+
+            optionsContainer.innerHTML = '';
+            question.options.forEach((option, index) => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'option';
+                optionDiv.innerHTML = `
+                    <input type="radio" name="answer" id="option${index}" value="${option}">
+                    <label for="option${index}" style="cursor: pointer; flex: 1;">${option}</label>
+                `;
+                
+                if (answeredQuestions[currentQuestionIndex] === option) {
+                    optionDiv.classList.add('selected');
+                    optionDiv.querySelector('input').checked = true;
+                }
+
+                optionDiv.addEventListener('click', function(e) {
+                    if (e.target.tagName !== 'INPUT') {
+                        this.querySelector('input').checked = true;
+                    }
+                    document.querySelectorAll('.option').forEach(opt => {
+                        opt.classList.remove('selected');
+                    });
+                    this.classList.add('selected');
+                });
+
+                optionsContainer.appendChild(optionDiv);
+            });
+
+            updateButtons();
+        }
+
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const checkBtn = document.getElementById('checkBtn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            prevBtn.disabled = currentQuestionIndex === 0;
+
+            if (answeredQuestions[currentQuestionIndex] !== null) {
+                checkBtn.classList.add('hidden');
+                nextBtn.classList.remove('hidden');
+            } else {
+                checkBtn.classList.remove('hidden');
+                nextBtn.classList.add('hidden');
+            }
+        }
+
+        function checkAnswer() {
+            const selectedOption = document.querySelector('input[name="answer"]:checked');
+            
+            if (!selectedOption) {
+                alert('Lütfen bir şık seçin!');
+                return;
+            }
+
+            const userAnswer = selectedOption.value;
+            const correctAnswer = questions[currentQuestionIndex].correctAnswer;
+            
+            answeredQuestions[currentQuestionIndex] = userAnswer;
+
+            const options = document.querySelectorAll('.option');
+            options.forEach(option => {
+                const optionValue = option.querySelector('input').value;
+                option.style.pointerEvents = 'none';
+                
+                if (optionValue === correctAnswer) {
+                    option.classList.add('correct');
+                } else if (optionValue === userAnswer && userAnswer !== correctAnswer) {
+                    option.classList.add('incorrect');
+                }
+            });
+
+            if (userAnswer === correctAnswer) {
+                score++;
+            }
+
+            document.getElementById('checkBtn').classList.add('hidden');
+            document.getElementById('nextBtn').classList.remove('hidden');
+        }
+
+        function nextQuestion() {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                showQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function previousQuestion() {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                showQuestion();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quizScreen').classList.add('hidden');
+            document.getElementById('resultsScreen').classList.remove('hidden');
+
+            const percentage = ((score / questions.length) * 100).toFixed(1);
+            document.getElementById('finalScore').textContent = `${percentage}%`;
+            document.getElementById('scoreDetails').textContent = 
+                `${questions.length} sorudan ${score} tanesini doğru cevapladınız.`;
+
+            let feedback = '';
+            if (percentage >= 90) {
+                feedback = '🌟 Mükemmel! Veri Bilimi konusunda harika bir bilgiye sahipsiniz!';
+            } else if (percentage >= 70) {
+                feedback = '👍 Çok iyi! Konuyu iyi biliyorsunuz.';
+            } else if (percentage >= 50) {
+                feedback = '📚 Fena değil! Biraz daha çalışma ile başarılı olabilirsiniz.';
+            } else {
+                feedback = '💪 Tekrar deneyin! Konuyu biraz daha çalışmanız gerekebilir.';
+            }
+
+            document.getElementById('feedbackText').textContent = feedback;
+        }
+
+        function restartQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            answeredQuestions = [];
+            
+            questions = shuffleArray(questions);
+            questions.forEach(q => {
+                q.options = shuffleArray(q.options);
+            });
+
+            document.getElementById('resultsScreen').classList.add('hidden');
+            document.getElementById('startScreen').classList.remove('hidden');
+            document.getElementById('questionCounter').style.display = 'none';
+        }
+
+        window.onload = loadQuestions;
+    </script>
+</body>
+</html>
+
